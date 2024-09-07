@@ -10,5 +10,6 @@ SUDO=$(test ${EUID} -ne 0 && which sudo)
 if [ -d echotherm_src ]; then $(SUDO) rm -rf echotherm_src; else mkdir -p echotherm_src; fi
 
 git clone https://github.com/EchoMAV/EchoTherm-Daemon.git echotherm_src
-cd echotherm_src && $SUDO ./install.sh && $SUDO cp build/echotherm /usr/local/bin/. && cp build/echotherd /usr/local/bin/. && cd ..
+cd echotherm_src && $SUDO ./install.sh && cd ..
+# during install echothermd and echotherm are install to /usr/local/bin
 
