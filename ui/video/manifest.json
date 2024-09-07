@@ -1,0 +1,11 @@
+{
+    "version": 0,
+    "content-security-policy": "script-src 'self' 'unsafe-inline' 'unsafe-eval'",    
+    "menu": {
+        "video": {
+            "label": "Video Configuration",
+            "path": "video.html",
+            "order": 3
+        }
+    }
+}
