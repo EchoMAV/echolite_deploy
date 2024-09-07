@@ -27,7 +27,7 @@ SW_LOCATION=sw_driver
 N2N_REPO=https://github.com/ntop/n2n.git
 N2N_REV=3.1.1
 
-.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm
+.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx
 
 default:
 	@echo "Please choose an action:"
@@ -65,6 +65,10 @@ echotherm:
 boson:
 # install boson dependencies
 	@$(SUDO) ./ensure-boson.sh
+
+nginx:
+# install nginx
+	@$(SUDO) ./ensure-nginx.sh 
 
 n2n:
 # clone and build n2n
@@ -126,6 +130,12 @@ install: dependencies
 
 # install echotherm
 	@$(MAKE) --no-print-directory echotherm
+
+# install boson
+	@$(MAKE) --no-print-directory boson
+
+# install nginx
+	@$(MAKE) --no-print-directory nginx
 
 # set up folders used by echoliteProxy
 	@echo "Setting up echoliteProxy folders..."
