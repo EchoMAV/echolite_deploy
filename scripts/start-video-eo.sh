@@ -11,10 +11,10 @@
 # EO_BITRATE=2000
 
 SUDO=$(test ${EUID} -ne 0 && which sudo)
-LOCAL=/usr/local
+TUNING_FILE=/usr/local/echopilot/echoliteProxy/477-Pi4.json
 
 echo "Start EchoLite EO Video Script for $PLATFORM"
 
 # Start pistreamer
-python3 pistreamer.py ${EO_HOST} ${EO_PORT} ${EO_BITRATE}
+python3 pistreamer.py ${EO_HOST} ${EO_PORT} ${EO_BITRATE} ${TUNING_FILE}
 

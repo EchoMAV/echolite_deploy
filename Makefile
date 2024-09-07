@@ -27,7 +27,7 @@ SW_LOCATION=sw_driver
 N2N_REPO=https://github.com/ntop/n2n.git
 N2N_REV=3.1.1
 
-.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx
+.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx pistreamer
 
 default:
 	@echo "Please choose an action:"
@@ -57,6 +57,11 @@ cellular:
 network:
 # start an interactive session to configure the network
 	@$(SUDO) ./static-network.sh
+
+pistreamer:
+# install echotherm
+	@PLATFORM=$(PLATFORM) ./ensure-pistreamer.sh $(DRY_RUN)	
+	@$(SUDO) install -Dm755 477-Pi4.json $(LOCAL)/echopilot/echoliteProxy/.	
 
 echotherm:
 # install echotherm
@@ -109,32 +114,37 @@ enable:
 	@echo "Enabling services files..."
 	@( for s in $(ENABLE_SERVICES) ; do $(SUDO) systemctl enable $${s%.*} ; done ; true )
 	@echo ""
-	@echo "Video Service is installed. To run now use sudo systemctl start video or reboot"
-	@echo "Inspect output with sudo journalctl -fu video-eo or sudo journalctl -fu video-thermal"
 
 install: dependencies	
 
-# install video prequisites
+# install gstd and gst
 	$(SUDO) apt update
+	@echo "Installing GSTD and GST Interpipe..."
 	@PLATFORM=$(PLATFORM) ./ensure-gst.sh $(DRY_RUN)
 	@PLATFORM=$(PLATFORM) ./ensure-gstd.sh $(DRY_RUN)	
-	@PLATFORM=$(PLATFORM) ./ensure-pistreamer.sh $(DRY_RUN)	
-
-
+	
 # build and install n2n
-	@echo "Starting interactive session to set up N2N..."
+	@echo "Installing and configurign N2N..."
 	@$(MAKE) --no-print-directory n2n
 
+# install pistreamer
+	@echo "Installing Pi Streamer..."
+	@$(MAKE) --no-print-directory pistreamer
+
 # install cockpit
+	@echo "Installing Cockpit..."
 	@$(MAKE) --no-print-directory cockpit
 
 # install echotherm
+	@echo "Installing EchoTherm..."
 	@$(MAKE) --no-print-directory echotherm
 
 # install boson
+	@echo "Installing Boson..."
 	@$(MAKE) --no-print-directory boson
 
 # install nginx
+	@echo "Installing nginx..."
 	@$(MAKE) --no-print-directory nginx
 
 # set up folders used by echoliteProxy
