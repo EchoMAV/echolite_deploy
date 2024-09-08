@@ -5,7 +5,7 @@
 # example contents from video.conf
 # THERMAL_TYPE=BOSON640
 # THERMAL_HOST=192.168.43.1
-# THEMRAL_PORT=5601
+# THERMAL_PORT=5601
 # THERMAL_BITRATE=1000
 
 SUDO=$(test ${EUID} -ne 0 && which sudo)
@@ -31,6 +31,7 @@ gstd -e -f /var/run -l /var/run/video-stream/gstd.log -d /var/run/video-stream/g
 # video pipelines
 
 if [[ $THERMAL_TYPE == "BOSON640" ]]; then
+    echo "Looking for FLIR Boson 640"
     video_devices=$(ls /dev/video*)
     # Loop through each video device and check if it is a FLIR Boson camera
     for device in $video_devices; do
@@ -40,12 +41,15 @@ if [[ $THERMAL_TYPE == "BOSON640" ]]; then
         if [[ "$device_name" == *"Boson"* ]]; then
             echo "FLIR Boson camera found at: $device"   
             # create the pipeline thermalsrc
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_LOS_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! interpipesink name=thermalSrc
+            echo "Creating the thermalSrc pipeline..." 
+            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
             # original pipeline         
             #gst-launch-1.0 v4l2src device=/dev/video0 io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5600 sync=false
+            break
         fi
     done
 elif [[ $THERMAL_TYPE == "BOSON320" ]]; then
+    echo "Looking for FLIR Boson 320"
     video_devices=$(ls /dev/video*)
     # Loop through each video device and check if it is a FLIR Boson camera
     for device in $video_devices; do
@@ -55,12 +59,15 @@ elif [[ $THERMAL_TYPE == "BOSON320" ]]; then
         if [[ "$device_name" == *"Boson"* ]]; then
             echo "FLIR Boson camera found at: $device"       
             # create the pipeline thermalSrc
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_LOS_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! interpipesink name=thermalSrc
+            echo "Creating the thermalSrc pipeline..." 
+            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
             # original pipeline
             # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
+            break
          fi
     done
 elif [[ $THERMAL_TYPE == "ECHOTHERM320" ]]; then
+    echo "Looking for EchoTherm 320"
     #run echothermd to be able to control the echothermcam
     echothermd
     sleep 3
@@ -71,18 +78,21 @@ elif [[ $THERMAL_TYPE == "ECHOTHERM320" ]]; then
         if [[ "$device_name" == *"EchoTherm"* ]]; then
             echo "EchoMAV EchoTherm camera found at: $device"       
             # create the pipeline thermalSrc
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_LOS_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! interpipesink name=thermalSrc
+            echo "Creating the thermalSrc pipeline..." 
+            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
             # original pipeline
             # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
+            break
          fi
     done   
 fi
 
-# create the pipeline thermal
-gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=${THERMAL_HOST} port=${THERMAL_PORT} ${extra_los} name=thermalSink
-
 # start playing the thermalSrc pipeline set up above
+echo "Playing the thermalSrc pipeline..." 
 gst-client pipeline_play thermalSrc
+
+echo "Creating the thermal pipeline..." 
+gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=${THERMAL_HOST} port=${THERMAL_PORT} ${extra_los} name=thermalSink
 
 # echoliteProxy will start the thermal pipeline with gst-client pipeline_play thermal
 

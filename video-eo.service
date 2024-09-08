@@ -8,6 +8,7 @@ RequiresMountsFor=/etc /usr
 Type=forking
 ExecStart=/usr/local/echopilot/scripts/start-video-eo.sh
 EnvironmentFile=/usr/local/echopilot/echoliteProxy/video.conf
+ExecStop=/usr/local/echopilot/scripts/stop-video-eo.sh
 RuntimeDirectory=video-stream
 RuntimeDirectoryMode=0755
 ExecStartPre=/bin/sleep 1

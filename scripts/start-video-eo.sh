@@ -16,5 +16,5 @@ TUNING_FILE=/usr/local/echopilot/echoliteProxy/477-Pi4.json
 echo "Start EchoLite EO Video Script for $PLATFORM"
 
 # Start pistreamer
-/usr/local/echopilot/echoliteProxy/pistreamer.py ${EO_HOST} ${EO_PORT} ${EO_BITRATE} ${TUNING_FILE}
+$SUDO /usr/local/echopilot/echoliteProxy/pistreamer.py ${EO_HOST} ${EO_PORT} ${EO_BITRATE} ${TUNING_FILE} --daemon
 

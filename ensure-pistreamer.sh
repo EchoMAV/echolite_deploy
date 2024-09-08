@@ -25,6 +25,6 @@ fi
 # Install pistreamer
 echo "Cloning PiStreamer..."
 git clone https://github.com/EchoMAV/PiStreamer "$SRC"
-echo "Cloning PiStreamer..."
-$(SUDO) chmod +x $SRC/pistreamer.py 
+echo "Copying PiStreamer to ${DESTINATION}..."
 ${SUDO} cp $SRC/pistreamer.py "$DESTINATION"
+${SUDO} chmod +x $DESTINATION/pistreamer.py 

@@ -11,7 +11,7 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 
 SERIAL ?= $(shell python3 serial_number.py)
 LOCAL=/usr/local
-LOCAL_SCRIPTS=scripts/start.sh scripts/cockpitScript.sh scripts/temperature.sh scripts/start-video-eo.sh scripts/stop-video-thermal.sh scripts/serial_number.py scripts/snap.sh scripts/start-edge.sh
+LOCAL_SCRIPTS=scripts/start.sh scripts/cockpitScript.sh scripts/temperature.sh scripts/start-video-eo.sh scripts/stop-video-eo.sh scripts/start-video-thermal.sh scripts/stop-video-thermal.sh scripts/serial_number.py scripts/snap.sh scripts/start-edge.sh
 CONFIG ?= /var/local
 LIBSYSTEMD=/lib/systemd/system
 PKGDEPS ?= v4l-utils build-essential nano nload picocom curl htop modemmanager
@@ -60,7 +60,8 @@ updateProxy:
 	@echo "Installing echoliteProxy files..."
 	@[ -d $(LOCAL)/echopilot/echoliteProxy ] || $(SUDO) mkdir $(LOCAL)/echopilot/echoliteProxy
 	@$(SUDO) cp -a bin/. $(LOCAL)/echopilot/echoliteProxy/  
-	@$(SUDO) chmod +x $(LOCAL)/echopilot/echoliteProxy/echoliteProxy
+	@for s in $(LOCAL_SCRIPTS) ; do $(SUDO) install -Dm755 $${s} $(LOCAL)/echopilot/$${s} ; done
+	@$(SUDO) chmod +x $(LOCAL)/echopilot/echoliteProxy/echoliteProxy || true
 	@$(MAKE) --no-print-directory enable
 #now setup the network again
 	@$(MAKE) --no-print-directory network
