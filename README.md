@@ -3,9 +3,15 @@
 ## Using an IP Radio and Fermion (IMX477) + Boson/EchoTherm camera
 Radio Options
 - [x] HereLink **Do not use telemetry, only Power + Ethernet**
-- [x] JereLink Blue **Do not use telemetry, only Power + Ethernet**
+- [x] HereLink Blue **Do not use telemetry, only Power + Ethernet**
 - [x] Microhard pMDDL e.g. pMDDL2450, pMDDL1624
 - [x] Doodle Labs miniOEM
+
+Camera Options
+- [x] Fermion with EchoTherm 320
+- [x] Fermion with Boson 640
+- [x] Fermion with Boson 320
+- [x] Fermion without thermal camera
 
 No specific radio configuration is required, other than the radios must be on the same subnet and provisioned appropriately to allow UDP traffic between the air and ground radios.  
 
