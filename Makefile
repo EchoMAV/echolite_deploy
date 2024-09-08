@@ -103,18 +103,18 @@ cockpit:
 
 # set up cockpit files
 	@echo "Copying cockpit files..."
-	@$(SUDO) rm -rf /usr/share/cockpit/telemetry/ /usr/share/cockpit/mavnet-server/ /usr/share/cockpit/video/ /usr/share/cockpit/cellular
-	@$(SUDO) mkdir /usr/share/cockpit/telemetry/
-	@$(SUDO) cp -rf ui/telemetry/* /usr/share/cockpit/telemetry/
-	@$(SUDO) mkdir /usr/share/cockpit/mavnet-server/
-	@$(SUDO) cp -rf ui/mavnet-server/* /usr/share/cockpit/mavnet-server/
-	@$(SUDO) mkdir /usr/share/cockpit/video/
-	@$(SUDO) cp -rf ui/video/* /usr/share/cockpit/video/
-	@$(SUDO) mkdir /usr/share/cockpit/cellular
-	@$(SUDO) cp -rf ui/cellular/* /usr/share/cockpit/cellular/		
-	@$(SUDO) cp -rf ui/branding/debian/* /usr/share/cockpit/branding/debian/
-	@$(SUDO) cp -rf ui/static/* /usr/share/cockpit/static/	
-	@$(SUDO) cp -rf ui/base1/* /usr/share/cockpit/base1/
+	@$(SUDO) rm -rf /usr/share/cockpit/telemetry/ /usr/share/cockpit/mavnet-server/ /usr/share/cockpit/video/ /usr/share/cockpit/cellular || true
+	@$(SUDO) mkdir -p /usr/share/cockpit/telemetry/
+	@$(SUDO) cp -rf ui/telemetry/* /usr/share/cockpit/telemetry/ || true
+#@$(SUDO) mkdir -p /usr/share/cockpit/mavnet-server/ 
+#@$(SUDO) cp -rf ui/mavnet-server/* /usr/share/cockpit/mavnet-server/ || true
+	@$(SUDO) mkdir -p /usr/share/cockpit/video/
+	@$(SUDO) cp -rf ui/video/* /usr/share/cockpit/video/ || true
+	@$(SUDO) mkdir -p /usr/share/cockpit/cellular
+	@$(SUDO) cp -rf ui/cellular/* /usr/share/cockpit/cellular/ || true
+	@$(SUDO) cp -rf ui/branding/debian/* /usr/share/cockpit/branding/debian/ || true
+	@$(SUDO) cp -rf ui/static/* /usr/share/cockpit/static/ || true	
+	@$(SUDO) cp -rf ui/base1/* /usr/share/cockpit/base1/ || true
 	@$(SUDO) install -Dm755 version.txt $(LOCAL)/echopilot/.	
 
 disable:
@@ -142,10 +142,6 @@ install: dependencies
 	@echo "Installing and configurign N2N..."
 	@$(MAKE) --no-print-directory n2n
 
-# install pistreamer
-	@echo "Installing Pi Streamer..."
-	@$(MAKE) --no-print-directory pistreamer
-
 # install cockpit
 	@echo "Installing Cockpit..."
 	@$(MAKE) --no-print-directory cockpit
@@ -159,7 +155,7 @@ install: dependencies
 	@$(MAKE) --no-print-directory boson
 
 # install nginx
-	@echo "Installing nginx..."
+	@echo "Installing Nginx..."
 	@$(MAKE) --no-print-directory nginx
 
 # set up folders used by echoliteProxy
@@ -187,9 +183,13 @@ install: dependencies
 # install echoliteProxy files
 	@echo "Installing echoliteProxy files..."
 	@[ -d $(LOCAL)/echopilot/echoliteProxy ] || $(SUDO) mkdir $(LOCAL)/echopilot/echoliteProxy
-	@$(SUDO) cp -a bin/. $(LOCAL)/echopilot/echoliteProxy/  
+	@$(SUDO) cp -a bin/. $(LOCAL)/echopilot/echoliteProxy/ || true 
 # The baseline configuration files are including in this folder including video.conf
-	@$(SUDO) chmod +x $(LOCAL)/echopilot/echoliteProxy/echoliteProxy
+	@$(SUDO) chmod +x $(LOCAL)/echopilot/echoliteProxy/echoliteProxy || true
+
+# install pistreamer
+	@echo "Installing Pi Streamer..."
+	@$(MAKE) --no-print-directory pistreamer
 
 # install services and enable them
 	@$(MAKE) --no-print-directory enable

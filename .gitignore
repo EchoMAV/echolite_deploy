@@ -1,5 +1,6 @@
 # Ignore all directories ending with _src
 *_src/
+src/
 
 # Other files and directories to ignore
 *.log
