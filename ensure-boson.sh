@@ -11,6 +11,8 @@ if [ -d $SRC ]; then $(SUDO) rm -rf $SRC; else mkdir -p $SRC; fi
 
 git clone https://github.com/FLIR/rawBoson.git $SRC
 cd $SRC && $SUDO make 
+
+# copy rawBoson to /usr/local/bin
 $SUDO cp rawBoson /usr/local/bin/. 
 cd ..
 # set permissions for /dev/ttyACM0

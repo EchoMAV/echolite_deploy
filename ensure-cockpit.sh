@@ -22,5 +22,10 @@ $SUDO sed -i '/ListenStream=443/a ListenStream=80' /lib/systemd/system/cockpit.s
 $SUDO systemctl daemon-reload
 $SUDO systemctl restart cockpit.socket
 
+# Get the current Git branch name
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+# Write the branch name to version.txt
+echo "$branch_name" > version.txt
 
 
