@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mavlinkcamera>
+    <definition version="9">
+        <model>Fermion</model>
+        <vendor>EchoMAV</vendor>
+    </definition>
+    <parameters>
+          <parameter name="CAM_IRMODE" type="uint32" default="0">
+            <description>Thermal Color Palette</description>
+            <options>
+                <option name="White Hot" value="0" />
+                <option name="Black Hot" value="1" />
+                <option name="Color" value="3" />                
+            </options>
+            </parameter>               
+        </parameters>
+</mavlinkcamera>

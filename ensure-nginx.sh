@@ -23,5 +23,4 @@ fi
 
 echo "Copying camera definition(s) to /var/www/html..."
 
-$SUDO cp camera_fermion_boson.xml /var/www/html/.
-$SUDO cp camera_fermion_echotherm.xml /var/www/html/.
+$SUDO cp *.xml /var/www/html/.
