@@ -1,7 +1,19 @@
-# Echomav Deployment for the EchoLite Quadcopters
-## Using an IP Radio and Fermion (IMX477) + Boson/EchoTherm camera
+# Echomav Deployment for the EchoLite Quadcopters based on the EchoPilot SBX Hardware 
 
-Note that in this configuration, echoliteProxy is used to handle telemetry, so the telemtry cable should NOT be connected to the herelink, on the Ethernet. echoliteProxy also acts as a MAVLink-compatible camera manager for the Fermion, ensuring that the GCS receives the stream and is able to control the cameras.
+## Using an IP Radio and Fermion (IMX477) + Boson/EchoTherm camera
+Radio Options
+ * Herelink
+   - [x] [Do not use telemetry, only Power + Ethernet]
+ * Herelink Blue
+   - [x] [Do not use telemetry, only Power + Ethernet]
+ * MicroHard pMDDL
+   - [x] [e.g. PMDDL2450, pMDDL1624]
+ * Doodle Labs miniOEM
+   - [x] []
+
+No specific radio configuration is required, other than the radios must be on the same subnet and provisioned appropriately to allow UDP traffic between the air and ground radios.  
+
+Note that in this configuration, echoliteProxy is used to handle telemetry routing over the IP radio, so the telemtry cable should **NOT** be connected to the hHrelink, on the Ethernet. echoliteProxy also acts as a MAVLink-compatible camera manager for the Fermion, ensuring that the GCS receives the stream and is able to control the cameras.
 
 ## Dependencies
 
