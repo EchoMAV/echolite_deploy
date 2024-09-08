@@ -1,4 +1,4 @@
-# Echomav Deployment for the EchoLite Quadcopters based on the EchoPilot SBX Hardware 
+# Deployment project for the EchoLite Quadcopters based on the EchoPilot SBX Hardware with Fermion camera
 
 ## Using an IP Radio and Fermion (IMX477) + Boson/EchoTherm camera
 Radio Options
