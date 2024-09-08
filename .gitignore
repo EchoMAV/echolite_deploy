@@ -1,0 +1,8 @@
+# Ignore all directories ending with _src
+*_src/
+
+# Other files and directories to ignore
+*.log
+*.tmp
+*.swp
+build/

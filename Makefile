@@ -27,7 +27,7 @@ SW_LOCATION=sw_driver
 N2N_REPO=https://github.com/ntop/n2n.git
 N2N_REV=3.1.1
 
-.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx pistreamer
+.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx pistreamer updateProxy
 
 default:
 	@echo "Please choose an action:"
@@ -49,6 +49,21 @@ dependencies:
 	@if [ ! -z "$(PKGDEPS)" ] ; then $(SUDO) apt-get install -y $(PKGDEPS) ; fi
 	@curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | $(SUDO) bash
 	@$(SUDO) apt-get install speedtest
+
+updateProxy:
+# it happens frequently that we only want to update echoliteProxy, so this does it for us
+# set network to dhcp
+# assume user would have used the ./setup-network.sh script below to get interent and pull the repo
+#	@$(SUDO) ./setup-network.sh -i eth0 -a dhcp
+# stop services
+	@( for c in stop disable ; do $(SUDO) systemctl $${c} $(INSTALL_SERVICES) ; done ; true )
+	@echo "Installing echoliteProxy files..."
+	@[ -d $(LOCAL)/echopilot/echoliteProxy ] || $(SUDO) mkdir $(LOCAL)/echopilot/echoliteProxy
+	@$(SUDO) cp -a bin/. $(LOCAL)/echopilot/echoliteProxy/  
+	@$(SUDO) chmod +x $(LOCAL)/echopilot/echoliteProxy/echoliteProxy
+	@$(MAKE) --no-print-directory enable
+#now setup the network again
+	@$(MAKE) --no-print-directory network
 
 cellular:
 # run script which sets up nmcli "cellular" connection. Remove --defaults if you want it to be interactive, otherwise it'll use the default ATT APN: Broadband
