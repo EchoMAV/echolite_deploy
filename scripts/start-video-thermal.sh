@@ -26,24 +26,35 @@ echo "Start EchoLite Thermal Video Script for $PLATFORM"
 SCALED_THERMAL_BITRATE=$(($THERMAL_BITRATE * 1000)) 
 
 # First detect what camera is attached, need to make sure echothermd is running or the echotherm won't be detected
-echothermd --kill 
-echothermd
-sleep 3
+if echotherm --status | grep -q "echothermd not running"; then    
+    echo "Starting echotherm daemon..."
+    
+    # Path to the lock file
+    LOCK_FILE="/tmp/echotherm.lock"
+    # Check if the lock file exists
+    if [ -f "$LOCK_FILE" ]; then
+        # Remove the lock file
+        rm "$LOCK_FILE"      
+    fi
+    #echothermd
+    #sleep 3
+fi
 
+THERMALCAMERA=$(sudo "$TEST_SCRIPT")
 
-THERMALCAMERA=$SUDO $TEST_SCRIPT
+echo "Thermal Camera is ${THERMALCAMERA}"
 
-if [ $THERMALCAMERA="boson640" ] || [ $THERMALCAMERA="boson320" ] ; then
-
+if [ "$THERMALCAMERA" != "none" ]; then
     # ensure previous pipelines are cancelled and cleared
     set +e
     gstd -f /var/run -l /dev/null -d /dev/null -k
     set -e
     gstd -e -f /var/run -l /var/run/video-stream/gstd.log -d /var/run/video-stream/gst.log
+fi
 
-    # video pipelines
+if [ "$THERMALCAMERA" = "boson640" ] || [ "$THERMALCAMERA" = "boson320" ] ; then
 
-    if [ $THERMALCAMERA="boson640" ]; then
+    if [ "$THERMALCAMERA" = "boson640" ]; then
         echo "Detected FLIR Boson 640"
         video_devices=$(ls /dev/video*)
         # Loop through each video device and check if it is a FLIR Boson camera
@@ -61,7 +72,7 @@ if [ $THERMALCAMERA="boson640" ] || [ $THERMALCAMERA="boson320" ] ; then
                 break
             fi
         done
-    elif [ $THERMALCAMERA="boson320" ]; then
+    elif [ "$THERMALCAMERA" = "boson320" ]; then
         echo "Looking for FLIR Boson 320"
         video_devices=$(ls /dev/video*)
         # Loop through each video device and check if it is a FLIR Boson camera
@@ -81,7 +92,7 @@ if [ $THERMALCAMERA="boson640" ] || [ $THERMALCAMERA="boson320" ] ; then
         done
     fi
 
-elif [ $THERMALCAMERA="echotherm320" ]; then
+elif [ "$THERMALCAMERA" = "echotherm320" ]; then
     echo "Starting pipeline for Echotherm 320"
     #run echothermd to be able to control the echothermcam
 
@@ -101,13 +112,14 @@ elif [ $THERMALCAMERA="echotherm320" ]; then
     done   
 fi
 
-# start playing the thermalSrc pipeline set up above
-echo "Playing the thermalSrc pipeline..." 
-gst-client pipeline_play thermalSrc
+if [ "$THERMALCAMERA" != "none" ]; then
+    # start playing the thermalSrc pipeline set up above
+    echo "Playing the thermalSrc pipeline..." 
+    gst-client pipeline_play thermalSrc
 
-echo "Creating the thermal pipeline..." 
-gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=${THERMAL_HOST} port=${THERMAL_PORT} ${extra_los} name=thermalSink
-
+    echo "Creating the thermal pipeline..." 
+    gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=${THERMAL_HOST} port=${THERMAL_PORT} ${extra_los} name=thermalSink
+fi
 # TODO, rather than hard coding the THERMAL HOST, we will latch on to the first GCS connection, and use that
 
 # echoliteProxy will start the thermal pipeline with gst-client pipeline_play thermal
