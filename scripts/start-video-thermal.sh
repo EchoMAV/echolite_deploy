@@ -93,9 +93,9 @@ elif [ $THERMALCAMERA="echotherm320" ]; then
             echo "EchoMAV EchoTherm camera found at: $device"       
             # create the pipeline thermalSrc
             echo "Creating the thermalSrc pipeline..." 
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
+            gst-client pipeline_create thermalSrc v4l2src device=$device ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
             # original pipeline
-            # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
+            #gst-launch-1.0 v4l2src device=/dev/video0 ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.87 port=5600 sync=false
             break
          fi
     done   

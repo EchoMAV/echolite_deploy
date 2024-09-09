@@ -1,5 +1,6 @@
 #!/bin/bash
 # Detect which type of thermal camera is attached, respond with none, boson640, boson320, echotherm320
+# For EchoTherm, we assume that echothermd is already running, and therefore we should get a response from echotherm --status
 
 SUDO=$(test ${EUID} -ne 0 && which sudo)
 bosonfound=false
@@ -19,10 +20,9 @@ for device in /dev/video*; do
     fi
 done
 
-
-# TBD use echotherm --status to get info about if a echotherm camera is attached
-if echotherm --status 2>/dev/null | grep -q "running"; then    
+if echotherm --status | grep -q "echotherm camera connected"; then    
     echothermfound=true
+    echo "echotherm320"
 fi
 
 if [ "$bosonfound" = false ] && [ "$echothermfound" = false ]; then
