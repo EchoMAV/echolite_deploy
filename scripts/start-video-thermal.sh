@@ -10,67 +10,81 @@
 
 SUDO=$(test ${EUID} -ne 0 && which sudo)
 LOCAL=/usr/local
+TEST_SCRIPT=/usr/local/echopilot/scripts/detect-thermal.sh
 
-echo "Start SBX Video Script for $PLATFORM"
+
+echo "Start EchoLite Thermal Video Script for $PLATFORM"
 
 # if host is multicast, then append extra
-if [[ "$THERMAL_HOST" =~ ^[2][2-3][4-9].* ]]; then
-    extra_los="multicast-iface=${LOS_IFACE} auto-multicast=true ttl=10"
-fi
+
+#if [[ "$THERMAL_HOST" =~ ^[2][2-3][4-9].* ]]; then
+#    extra_los="multicast-iface=${LOS_IFACE} auto-multicast=true ttl=10"
+#fi
 
 #Scale the THERMAL_BITRATE from kbps to bps
 # different encoders take different scales, rpi v4l2h264enc takes bps
 SCALED_THERMAL_BITRATE=$(($THERMAL_BITRATE * 1000)) 
 
-# ensure previous pipelines are cancelled and cleared
-set +e
-gstd -f /var/run -l /dev/null -d /dev/null -k
-set -e
-gstd -e -f /var/run -l /var/run/video-stream/gstd.log -d /var/run/video-stream/gst.log
+# First detect what camera is attached, need to make sure echothermd is running or the echotherm won't be detected
+echothermd --kill 
+echothermd
+sleep 3
 
-# video pipelines
 
-if [[ $THERMAL_TYPE == "BOSON640" ]]; then
-    echo "Looking for FLIR Boson 640"
-    video_devices=$(ls /dev/video*)
-    # Loop through each video device and check if it is a FLIR Boson camera
-    for device in $video_devices; do
-        # Use v4l2-ctl to get the device name
-        device_name=$(v4l2-ctl -d $device --info | grep "Model" | awk '{print $3}')        
-        # Check if the device name matches FLIR Boson (assuming "boson" is part of the driver name)
-        if [[ "$device_name" == *"Boson"* ]]; then
-            echo "FLIR Boson camera found at: $device"   
-            # create the pipeline thermalsrc
-            echo "Creating the thermalSrc pipeline..." 
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
-            # original pipeline         
-            #gst-launch-1.0 v4l2src device=/dev/video0 io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5600 sync=false
-            break
-        fi
-    done
-elif [[ $THERMAL_TYPE == "BOSON320" ]]; then
-    echo "Looking for FLIR Boson 320"
-    video_devices=$(ls /dev/video*)
-    # Loop through each video device and check if it is a FLIR Boson camera
-    for device in $video_devices; do
-        # Use v4l2-ctl to get the device name
-        device_name=$(v4l2-ctl -d $device --info | grep "Model" | awk '{print $3}')        
-        # Check if the device name matches FLIR Boson (assuming "boson" is part of the driver name)
-        if [[ "$device_name" == *"Boson"* ]]; then
-            echo "FLIR Boson camera found at: $device"       
-            # create the pipeline thermalSrc
-            echo "Creating the thermalSrc pipeline..." 
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
-            # original pipeline
-            # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
-            break
-         fi
-    done
-elif [[ $THERMAL_TYPE == "ECHOTHERM320" ]]; then
-    echo "Looking for EchoTherm 320"
+THERMALCAMERA=$SUDO $TEST_SCRIPT
+
+if [ $THERMALCAMERA="boson640" ] || [ $THERMALCAMERA="boson320" ] ; then
+
+    # ensure previous pipelines are cancelled and cleared
+    set +e
+    gstd -f /var/run -l /dev/null -d /dev/null -k
+    set -e
+    gstd -e -f /var/run -l /var/run/video-stream/gstd.log -d /var/run/video-stream/gst.log
+
+    # video pipelines
+
+    if [ $THERMALCAMERA="boson640" ]; then
+        echo "Detected FLIR Boson 640"
+        video_devices=$(ls /dev/video*)
+        # Loop through each video device and check if it is a FLIR Boson camera
+        for device in $video_devices; do
+            # Use v4l2-ctl to get the device name
+            device_name=$(v4l2-ctl -d $device --info | grep "Model" | awk '{print $3}')        
+            # Check if the device name matches FLIR Boson (assuming "boson" is part of the driver name)
+            if [[ "$device_name" == *"Boson"* ]]; then
+                echo "FLIR Boson camera found at: $device"   
+                # create the pipeline thermalsrc
+                echo "Creating the thermalSrc pipeline..." 
+                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
+                # original pipeline         
+                #gst-launch-1.0 v4l2src device=/dev/video0 io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5600 sync=false
+                break
+            fi
+        done
+    elif [ $THERMALCAMERA="boson320" ]; then
+        echo "Looking for FLIR Boson 320"
+        video_devices=$(ls /dev/video*)
+        # Loop through each video device and check if it is a FLIR Boson camera
+        for device in $video_devices; do
+            # Use v4l2-ctl to get the device name
+            device_name=$(v4l2-ctl -d $device --info | grep "Model" | awk '{print $3}')        
+            # Check if the device name matches FLIR Boson (assuming "boson" is part of the driver name)
+            if [[ "$device_name" == *"Boson"* ]]; then
+                echo "FLIR Boson camera found at: $device"       
+                # create the pipeline thermalSrc
+                echo "Creating the thermalSrc pipeline..." 
+                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
+                # original pipeline
+                # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
+                break
+            fi
+        done
+    fi
+
+elif [ $THERMALCAMERA="echotherm320" ]; then
+    echo "Starting pipeline for Echotherm 320"
     #run echothermd to be able to control the echothermcam
-    echothermd
-    sleep 3
+
     for device in $video_devices; do
         # Use v4l2-ctl to get the device name
         device_name=$(v4l2-ctl -d $device --info | awk '/Card type/ { card_type = substr($0, index($0, ":") + 2) } END {print card_type}')        

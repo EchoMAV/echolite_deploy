@@ -11,7 +11,7 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 
 SERIAL ?= $(shell python3 serial_number.py)
 LOCAL=/usr/local
-LOCAL_SCRIPTS=scripts/start.sh scripts/cockpitScript.sh scripts/temperature.sh scripts/start-video-eo.sh scripts/stop-video-eo.sh scripts/start-video-thermal.sh scripts/stop-video-thermal.sh scripts/serial_number.py scripts/snap.sh scripts/start-edge.sh
+LOCAL_SCRIPTS=scripts/start.sh scripts/cockpitScript.sh scripts/temperature.sh scripts/start-video-eo.sh scripts/stop-video-eo.sh scripts/start-video-thermal.sh scripts/stop-video-thermal.sh scripts/serial_number.py scripts/snap.sh scripts/start-edge.sh scripts/detect-thermal.sh scripts/detect-eo.sh
 CONFIG ?= /var/local
 LIBSYSTEMD=/lib/systemd/system
 PKGDEPS ?= v4l-utils build-essential nano nload picocom curl htop modemmanager
