@@ -94,6 +94,8 @@ gst-client pipeline_play thermalSrc
 echo "Creating the thermal pipeline..." 
 gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=${THERMAL_HOST} port=${THERMAL_PORT} ${extra_los} name=thermalSink
 
+# TODO, rather than hard coding the THERMAL HOST, we will latch on to the first GCS connection, and use that
+
 # echoliteProxy will start the thermal pipeline with gst-client pipeline_play thermal
 
 # Notes on the Boson control using rawBoson
