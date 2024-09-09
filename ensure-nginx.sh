@@ -23,4 +23,4 @@ fi
 
 echo "Copying camera definition(s) to /var/www/html..."
 
-$SUDO cp *.xml /var/www/html/.
+$SUDO cp camera_definitions/*.xml /var/www/html/.

@@ -15,10 +15,10 @@ LOCAL_SCRIPTS=scripts/start.sh scripts/cockpitScript.sh scripts/temperature.sh s
 CONFIG ?= /var/local
 LIBSYSTEMD=/lib/systemd/system
 PKGDEPS ?= v4l-utils build-essential nano nload picocom curl htop modemmanager
-INSTALL_SERVICES=temperature.service video-eo.service video-thermal.service edge.service
+INSTALL_SERVICES=temperature.service edge.service
 # when ready, add echoliteProxy.service
 # video-eo and video-thermal will be manually started by echoliteProxy
-ENABLE_SERVICES=temperature.service edge.service
+ENABLE_SERVICES=temperature.service edge.service video-eo.service video-thermal.service
 # when ready, add echoliteProxy.service
 SYSCFG=/usr/local/echopilot/echoliteProxy
 DRY_RUN=false
