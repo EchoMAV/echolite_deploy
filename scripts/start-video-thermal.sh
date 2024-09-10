@@ -30,14 +30,16 @@ if echotherm --status | grep -q "echothermd not running"; then
     echo "Starting echotherm daemon..."
     
     # Path to the lock file
-    LOCK_FILE="/tmp/echotherm.lock"
+    LOCK_FILE="/tmp/echothermd.lock"
     # Check if the lock file exists
     if [ -f "$LOCK_FILE" ]; then
+        echo "Removing found lock file"
+        sudo -u echopilot /usr/local/bin/echothermd --kill
         # Remove the lock file
         rm "$LOCK_FILE"      
     fi
-    #echothermd
-    #sleep 3
+    sudo -u echopilot /usr/local/bin/echothermd
+    sleep 3
 fi
 
 THERMALCAMERA=$(sudo "$TEST_SCRIPT")
@@ -95,15 +97,16 @@ if [ "$THERMALCAMERA" = "boson640" ] || [ "$THERMALCAMERA" = "boson320" ] ; then
 elif [ "$THERMALCAMERA" = "echotherm320" ]; then
     echo "Starting pipeline for Echotherm 320"
     #run echothermd to be able to control the echothermcam
-
+    video_devices=$(ls /dev/video*)
     for device in $video_devices; do
         # Use v4l2-ctl to get the device name
         device_name=$(v4l2-ctl -d $device --info | awk '/Card type/ { card_type = substr($0, index($0, ":") + 2) } END {print card_type}')        
-        # Check if the device name matches FLIR Boson (assuming "boson" is part of the driver name)
-        if [[ "$device_name" == *"EchoTherm"* ]]; then
+        # Check if the device name matches EchoTherm
+        echo "Inspecting $device and checking $device_name for EchoTherm or Dummy video"
+        if [[ "$device_name" == *"EchoTherm"* || "$device_name" == *"Dummy video"* ]]; then        
             echo "EchoMAV EchoTherm camera found at: $device"       
             # create the pipeline thermalSrc
-            echo "Creating the thermalSrc pipeline..." 
+            echo "Creating the thermalSrc pipeline..."           
             gst-client pipeline_create thermalSrc v4l2src device=$device ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
             # original pipeline
             #gst-launch-1.0 v4l2src device=/dev/video0 ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.87 port=5600 sync=false
