@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <mavlinkcamera>
     <definition version="9">
-        <model>Fermion</model>
+        <model>Fermion - EchoTherm</model>
         <vendor>EchoMAV</vendor>
     </definition>
     <parameters>
@@ -10,8 +10,29 @@
             <options>
                 <option name="White Hot" value="0" />
                 <option name="Black Hot" value="1" />
-                <option name="Color" value="3" />                
+                <option name="Spectra" value="3" />              
+                <option name="Tyrian" value="4" />
+                <option name="Iron" value="5" />
+                <option name="Amber" value="6" />        
+                <option name="Hi" value="7" />
+                <option name="Green" value="8" />
+                <option name="User 0" value="9" />        
+                <option name="User 1" value="10" />
+                <option name="User 2" value="11" />
+                <option name="User 3" value="12" />        
+                <option name="User 4" value="13" />
             </options>
-            </parameter>               
-        </parameters>
+        </parameter>    
+        <parameter name="CAM_SHUTTERMODE" type="int32" default="0">
+        <description>Shutter Mode</description>
+        <options>
+            <option name="Off/Manual" value="-1" />
+            <option name="Auto" value="0" />
+            <option name="Every 30s" value="30" />
+            <option name="Every 60s" value="60" />
+            <option name="Every 120s" value="120" />
+            <option name="Every 240s" value="240" />
+        </options>
+    </parameter>                  
+    </parameters>
 </mavlinkcamera>
