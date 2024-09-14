@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <mavlinkcamera>
-    <definition version="9">
+    <definition version="2">
         <model>Fermion - Boson</model>
         <vendor>EchoMAV</vendor>
     </definition>
     <parameters>
-          <parameter name="CAM_IRMODE" type="uint32" default="0">
+        <parameter name="CAM_IRMODE" type="uint32" default="0">
             <description>Thermal Color Palette</description>
             <options>
                 <option name="White Hot" value="0" />
@@ -19,6 +19,15 @@
                 <option name="Hottest" value="9" /> 
                 <option name="ID End" value="10" />
             </options>
-            </parameter>               
-        </parameters>
+        </parameter>   
+        <parameter name="IR_BITRATE" type="uint32" default="1000">
+            <description>Thermal Bitrate</description>
+            <options>
+                <option name="500 Kbps" value="500" />
+                <option name="1000 Kbps" value="1000" />
+                <option name="1500 Kbps" value="1500" />
+                <option name="2000 Kbps" value="2000" />                      
+            </options>
+        </parameter>                
+    </parameters>
 </mavlinkcamera>
