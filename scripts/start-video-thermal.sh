@@ -123,7 +123,7 @@ if [ "$THERMALCAMERA" != "none" ]; then
     gst-client pipeline_play thermalSrc
 
     echo "Creating the thermal pipeline..." 
-    gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=127.0.0.1 port=5601 name=thermalSink
+    gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true ! queue ! udpsink sync=false host=127.0.0.1 port=5601 name=thermalSink
 fi
 # TODO, rather than hard coding the THERMAL HOST, we will latch on to the first GCS connection, and use that
 
