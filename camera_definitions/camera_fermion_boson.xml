@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <mavlinkcamera>
-    <definition version="2">
+    <definition version="5">
         <model>Fermion - Boson</model>
         <vendor>EchoMAV</vendor>
     </definition>
