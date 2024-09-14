@@ -34,6 +34,19 @@
             <option name="Every 240s" value="240" />
         </options>
     </parameter>  
+    <parameter name="EO_BITRATE" type="uint32" default="2000">
+            <description>EO Bitrate</description>
+            <options>
+                <option name="500 Kbps" value="500" />
+                <option name="1000 Kbps" value="1000" />
+                <option name="1500 Kbps" value="1500" />
+                <option name="2000 Kbps" value="2000" />
+                <option name="2500 Kbps" value="2500" />
+                <option name="3000 Kbps" value="3000" />
+                <option name="3500 Kbps" value="3500" />
+                <option name="4000 Kbps" value="4000" />              
+            </options>
+        </parameter>  
      <parameter name="IR_BITRATE" type="uint32" default="1000">
             <description>Thermal Bitrate</description>
             <options>
