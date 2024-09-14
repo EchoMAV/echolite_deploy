@@ -109,9 +109,9 @@ elif [ "$THERMALCAMERA" = "echotherm320" ]; then
             echo "Creating the thermalSrc pipeline..."           
             #working before zoom
             #gst-client pipeline_create thermalSrc v4l2src device=$device ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
-            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmmap ! queue ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc           
+            gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! queue ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc           
             # original pipeline
-            #gst-launch-1.0 v4l2src device=/dev/video0 ! v4l2h264enc extra-controls="controls,video_bitrate=1000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.28 port=5800 sync=false
+            #gst-launch-1.0 v4l2src device=/dev/video0 io-mode=mmap ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.28 port=5800 sync=false
             break
          fi
     done   
