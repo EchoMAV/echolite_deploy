@@ -68,7 +68,8 @@ if [ "$THERMALCAMERA" = "boson640" ] || [ "$THERMALCAMERA" = "boson320" ] ; then
                 echo "FLIR Boson camera found at: $device"   
                 # create the pipeline thermalsrc
                 echo "Creating the thermalSrc pipeline..." 
-                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! queue ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
+                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! videoconvert ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=${THERMAL_BITRATE} name=thermalEncoder ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc           
+                #gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! queue ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc
                 # original pipeline         
                 #gst-launch-1.0 v4l2src device=/dev/video0 io-mode=mmap ! "video/x-raw,format=(string)I420,width=(int)640,height=(int)512,framerate=(fraction)30/1" ! v4l2h264enc extra-controls="controls,video_bitrate=2000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5600 sync=false
                 break
@@ -86,7 +87,8 @@ if [ "$THERMALCAMERA" = "boson640" ] || [ "$THERMALCAMERA" = "boson320" ] ; then
                 echo "FLIR Boson camera found at: $device"       
                 # create the pipeline thermalSrc
                 echo "Creating the thermalSrc pipeline..." 
-                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! queue ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! queue ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
+                gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! videoconvert ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=${THERMAL_BITRATE} name=thermalEncoder ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc           
+                #gst-client pipeline_create thermalSrc v4l2src device=$device io-mode=mmap ! queue ! "video/x-raw,format=(string)I420,width=(int)320,height=(int)256,framerate=(fraction)30/1" ! queue ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc
                 # original pipeline
                 # gst-launch-1.0 v4l2src device=$device ! v4l2h264enc extra-controls="controls,video_bitrate=${SCALED_LOS_THERMAL_BITRATE}" name=thermalEncoder ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalsrc
                 break
@@ -109,9 +111,13 @@ elif [ "$THERMALCAMERA" = "echotherm320" ]; then
             echo "Creating the thermalSrc pipeline..."           
             #working before zoom
             #gst-client pipeline_create thermalSrc v4l2src device=$device ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc
-            gst-client pipeline_create thermalSrc v4l2src device=$device ! queue ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! interpipesink name=thermalSrc           
+            #gst-client pipeline_create thermalSrc v4l2src device=$device ! queue ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,h264_profile=1,h264_level=11,video_bitrate=${SCALED_THERMAL_BITRATE},h264_i_frame_period=30,h264_minimum_qp_value=10" name=thermalEncoder ! "video/x-h264,level=(string)4" ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc           
+            #software encoder below, possibly more reliable for some unknown reason. to be stress tested
+            gst-client pipeline_create thermalSrc v4l2src device=$device ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! videoconvert ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=${THERMAL_BITRATE} name=thermalEncoder ! rtph264pay config-interval=1 pt=96 ! queue ! interpipesink name=thermalSrc           
             # original pipeline
-            #gst-launch-1.0 v4l2src device=/dev/video0 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.28 port=5800 sync=false
+            #gst-launch-1.0 v4l2src device=/dev/video0 ! queue ! v4l2h264enc extra-controls="controls,video_bitrate=1000000" ! "video/x-h264,level=(string)4.2" ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5800 sync=false
+            #gst-launch-1.0 v4l2src device=/dev/video0 ! videocrop top=0 left=0 right=0 bottom=0 name=thermalZoom ! videoscale ! video/x-raw,width=320,height=256 ! videoconvert ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=1000 ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.59 port=5800 sync=false
+            #x264enc tune=zerolatency speed-preset=ultrafast bitrate=4000
             break
          fi
     done   
@@ -123,7 +129,7 @@ if [ "$THERMALCAMERA" != "none" ]; then
     gst-client pipeline_play thermalSrc
 
     echo "Creating the thermal pipeline..." 
-    gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true stream-sync=compensate-ts ! udpsink sync=false host=127.0.0.1 port=5601 name=thermalSink
+    gst-client pipeline_create thermal interpipesrc listen-to=thermalSrc block=true is-live=true allow-renegotiation=true ! queue ! udpsink sync=false host=127.0.0.1 port=5601 name=thermalSink
 fi
 # TODO, rather than hard coding the THERMAL HOST, we will latch on to the first GCS connection, and use that
 
