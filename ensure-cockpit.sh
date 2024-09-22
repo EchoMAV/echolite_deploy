@@ -12,7 +12,20 @@ SUDO=$(test ${EUID} -ne 0 && which sudo)
 $SUDO echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/backports.list
 $SUDO apt update
 
-$SUDO apt install -y -t bookworm-backports cockpit
+# Disable exit on error
+set +e
+# Try to install the package, but don't return an error
+$SUDO apt install -y -t bookworm-backports cockpit || true
+# Re-enable exit on error
+set -e
+
+# Check if the installation was successful
+if [ $? -eq 0 ]; then
+    echo "Installation successful.."
+else
+    echo "Installation using bookworm-backport sources failed. Trying the alternative..."
+    $SUDO apt install -y cockpit
+fi
 
 # Change the port to 443/80 and restart
 
