@@ -15,7 +15,7 @@ $SUDO apt update
 # Disable exit on error
 set +e
 # Try to install the package, but don't return an error
-$SUDO apt install -y -t bookworm-backports cockpit || true
+$SUDO apt install -y -t bookworm-backports cockpit
 # Re-enable exit on error
 set -e
 
