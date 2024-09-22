@@ -108,7 +108,7 @@ cockpit:
 #@$(SUDO) mkdir -p /usr/share/cockpit/mavnet-server/ 
 #@$(SUDO) cp -rf ui/mavnet-server/* /usr/share/cockpit/mavnet-server/ || true
 	@$(SUDO) mkdir -p /usr/share/cockpit/video/
-	@$(SUDO) cp -rf ui/video/* /usr/share/cockpit/video/ || true
+	@$(SUDO) cp -rf ui/telemetry/* /usr/share/cockpit/telemetry/ || true
 	@$(SUDO) mkdir -p /usr/share/cockpit/cellular
 	@$(SUDO) cp -rf ui/cellular/* /usr/share/cockpit/cellular/ || true
 	@$(SUDO) cp -rf ui/branding/debian/* /usr/share/cockpit/branding/debian/ || true

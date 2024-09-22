@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         -s)
-            ls /dev/ | grep ttyS | sed -e "s/.*/\/dev\/&/"
+            ls /dev/ | grep ttyA | sed -e "s/.*/\/dev\/&/"
             exit 0
             ;;
         -i)
@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
 	    -t)
-            journalctl --no-pager -q -r -u mavnetProxy --output=short | grep -Po '(^|[ ,])FMU Connected=\K[^,]*' -m1 | sed 's/.$//'
+            journalctl --no-pager -q -r -u echoliteProxy --output=short | grep -Po '(^|[ ,])FMU Connected=\K[^,]*' -m1 | sed 's/.$//'
 	        exit 0
             ;;
     esac

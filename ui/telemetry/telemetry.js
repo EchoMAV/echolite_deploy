@@ -1,5 +1,5 @@
 const scriptLocation = "/usr/local/echopilot/scripts/"
-const confLocation = "/usr/local/echopilot/mavnetProxy/"
+const confLocation = "/usr/local/echopilot/echoliteProxy/"
 const version = document.getElementById("version");
 const file_location = document.getElementById("file_location");
 const losHost = document.getElementById("losHost");
@@ -7,7 +7,6 @@ const losPort = document.getElementById("losPort");
 const losIface = document.getElementById("losIface");
 const fmuDevice = document.getElementById("fmuDevice");
 const baudrate = document.getElementById("baudrate");
-const fmuId = document.getElementById("fmuId");
 const atakHost = document.getElementById("atakHost");
 const atakPort = document.getElementById("atakPort");
 const fmuConnStatus = document.getElementById("fmuConnStatus");
@@ -26,9 +25,9 @@ document.getElementById("save").addEventListener("click", SaveSettings);
 // if it fails then the values are loaded with defaults.
 function InitPage() {
 
-    file_location.innerHTML = confLocation + "mavnetProxy.conf";
+    file_location.innerHTML = confLocation + "echoliteProxy.conf";
 
-    cockpit.file(confLocation + "mavnetProxy.conf")
+    cockpit.file(confLocation + "echoliteProxy.conf")
         .read().then((content, tag) => SuccessReadFile(content))
             .catch(error => FailureReadFile(error));
     cockpit.script(scriptLocation + "cockpitScript.sh -v")
@@ -96,8 +95,7 @@ function SuccessReadFile(content) {
             cockpit.script(scriptLocation + "cockpitScript.sh -s")                
                 .then((content) => AddDropDown(fmuDevice, content.trim().split("\n"), myConfig.FMU_SERIAL)) 
                 .catch(error => Fail("Get Serial", error));
-            AddDropDown(baudrate, baudRateArray, myConfig.FMU_BAUDRATE);
-            fmuId.value = myConfig.FMU_SYSID
+            AddDropDown(baudrate, baudRateArray, myConfig.FMU_BAUDRATE);            
             losHost.value = myConfig.TELEM_LOS.split(",")[1].split(":")[0];
             losPort.value = myConfig.TELEM_LOS.split(",")[1].split(":")[1];
             cockpit.script(scriptLocation + "cockpitScript.sh -i")
@@ -143,8 +141,7 @@ function FailureReadFile(error) {
     // Display error message
     output.innerHTML = "Error : " + error.message;
     losHost.value = "172.20.1.1";
-    losPort.value = "14550";
-    fmuId.value = "1";
+    losPort.value = "14550";    
     atakHost.value = "239.2.3.1";
     atakPort.value = "6969";       
 }
@@ -166,8 +163,7 @@ function EnableService(){
     
     var fileString = "[Service]\n" + 
         "FMU_SERIAL=" + fmuDevice.value + "\n" +
-        "FMU_BAUDRATE=" + baudrate.value + "\n" +
-        "FMU_SYSID=" + fmuId.value + "\n" +
+        "FMU_BAUDRATE=" + baudrate.value + "\n" +        
         "LOS_HOST=" + losHost.value + "\n" +
         "LOS_PORT=" + losPort.value + "\n" +
         "LOS_IFACE=" + losIface.value + "\n" +
@@ -175,7 +171,7 @@ function EnableService(){
         "ATAK_PORT=" + atakPort.value + "\n" +
         "ENABLED=" + enabled.toString() + "\n";
 
-    cockpit.file(confLocation + "mavnetProxy.conf").replace(fileString)
+    cockpit.file(confLocation + "echoliteProxy.conf").replace(fileString)
         .then(CreateSystemDService).catch(error => {output.innerHTML = error.message});
 }
 
@@ -196,8 +192,7 @@ function DisableService(){
 
     var fileString = "[Service]\n" + 
         "FMU_SERIAL=" + fmuDevice.value + "\n" +
-        "FMU_BAUDRATE=" + baudrate.value + "\n" +
-        "FMU_SYSID=" + fmuId.value + "\n" +
+        "FMU_BAUDRATE=" + baudrate.value + "\n" +        
         "LOS_HOST=" + losHost.value + "\n" +
         "LOS_PORT=" + losPort.value + "\n" +
         "LOS_IFACE=" + losIface.value + "\n" +
@@ -249,16 +244,15 @@ function SaveSettings() {
    var fileString = 
        "TELEM_LOS=" + losIface.value + ","+ losHost.value + ":" + losPort.value + "\n" +
        "FMU_SERIAL=" + fmuDevice.value + "\n" +
-       "FMU_BAUDRATE=" + baudrate.value + "\n" +
-       "FMU_SYSID=" + fmuId.value + "\n" +        
+       "FMU_BAUDRATE=" + baudrate.value + "\n" +     
        "ATAK_HOST=" + atakHost.value + "\n" +
        "ATAK_PORT=" + atakPort.value + "\n";       
 
-   cockpit.file(confLocation + "mavnetProxy.conf", { superuser : "try" }).replace(fileString)
+   cockpit.file(confLocation + "echoliteProxy.conf", { superuser : "try" }).replace(fileString)
        .then(Success)
        .catch(Fail);
  
-   cockpit.spawn(["systemctl", "restart", "mavnetProxy"]);   
+   cockpit.spawn(["sudo", "systemctl", "restart", "echoliteProxy"]);   
 }
 
 function Success() {
