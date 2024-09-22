@@ -20,11 +20,9 @@ $SUDO apt install -y -t bookworm-backports cockpit
 set -e
 
 # Check if the installation was successful
-if [ $? -eq 0 ]; then
-    echo "Installation successful.."
-else
-    echo "Installation using bookworm-backport sources failed. Trying the alternative..."
-    $SUDO apt install -y cockpit
+if [ $? -ne 0 ]; then
+    echo "The command failed. Running the alternative command..."
+    $SUDO apt install -y cockpit    
 fi
 
 # Change the port to 443/80 and restart
