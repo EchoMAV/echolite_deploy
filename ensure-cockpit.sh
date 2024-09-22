@@ -17,7 +17,7 @@ set +e
 # Try to install the package, but don't return an error
 $SUDO apt install -y -t bookworm-backports cockpit
 # Re-enable exit on error
-set -e
+
 
 # Check if the installation was successful
 if [ $? -ne 0 ]; then
@@ -25,6 +25,7 @@ if [ $? -ne 0 ]; then
     $SUDO apt install -y cockpit    
 fi
 
+set -e
 # Change the port to 443/80 and restart
 
 $SUDO sed -i 's/9090/443/g' /lib/systemd/system/cockpit.socket
