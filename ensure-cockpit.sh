@@ -16,15 +16,13 @@ $SUDO apt update
 set +e
 # Try to install the package, but don't return an error
 $SUDO apt install -y -t bookworm-backports cockpit
-# Re-enable exit on error
-
-
 # Check if the installation was successful
 if [ $? -ne 0 ]; then
-    echo "The command failed. Running the alternative command..."
+    echo "The install failed, probably due to no bookworm-backports package, Running the standard cockpit install..."
     $SUDO apt install -y cockpit    
 fi
 
+# Re-enable exit on error
 set -e
 # Change the port to 443/80 and restart
 
