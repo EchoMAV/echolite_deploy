@@ -25,7 +25,7 @@ SW_LOCATION=sw_driver
 N2N_REPO=https://github.com/ntop/n2n.git
 N2N_REV=3.1.1
 
-.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx pistreamer updateProxy
+.PHONY = clean dependencies cockpit cellular network enable install provision provision-video see uninstall n2n echotherm boson nginx pistreamer updateProxy
 
 default:
 	@echo "Please choose an action:"
@@ -207,6 +207,9 @@ install: dependencies
 # provision primary config file with telemetry endpoint
 	@$(MAKE) --no-print-directory provision
 
+# provision video config 
+	@$(MAKE) --no-print-directory provision-video
+
 # cleanup and final settings
 	@echo "Final cleanup..."
 	@$(SUDO) chown -R echopilot /usr/local/echopilot
@@ -228,6 +231,9 @@ see:
 
 provision:
 	@$(MAKE) --no-print-directory -B $(SYSCFG)/echoliteProxy.conf
+
+provision-video:
+	@$(MAKE) --no-print-directory -B $(SYSCFG)/video.conf
 
 $(SYSCFG)/%.conf:
 	@PLATFORM=$(PLATFORM) ./provision.sh $@

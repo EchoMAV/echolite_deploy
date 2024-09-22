@@ -92,7 +92,38 @@ case "$(basename $CONF)" in
         echo "SPARECOT_PORT=7200" >> /tmp/$$.env
 		;;
 
-	
+	video.conf)
+		# want to have option to change ATAK_VIDEO_HOST:PORT
+		MAC_ADDRESS=$(ifconfig eth0 | awk '/ether/ {print $2}')
+		OCT1DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[5]}'`))
+		OCT2DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[6]}'`))
+
+		ATAK_VIDEO_HOST=239.0.$OCT1DEC.$OCT2DEC  # $(echo $(address_of ${IFACE}) | cut -f1,2 -d.).255.255)
+		ATAK_VIDEO_PORT=$(value_of ATAK_VIDEO_PORT 5600)
+
+		if ! $DEFAULTS ; then
+			#IFACE=$(interactive "$IFACE" "UDP Interface for telemetry")
+			ATAK_VIDEO_HOST=$(interactive "$ATAK_VIDEO_HOST" "ATAK Multicast Video Group Address")
+			ATAK_VIDEO_PORT=$(interactive "$ATAK_VIDEO_PORT" "ATAK Multicast Video Port")								
+		fi
+
+		echo "[Service]" > /tmp/$$.env && \
+		echo "EO_PORT=5700" >> /tmp/$$.env && \
+        echo "EO_BITRATE=2000" >> /tmp/$$.env && \
+        echo "THERMAL_PORT=5800" >> /tmp/$$.env && \
+        echo "THERMAL_BITRATE=750" >> /tmp/$$.env && \
+        echo "ATAK_VIDEO_HOST=${ATAK_VIDEO_HOST}" >> /tmp/$$.env && \
+        echo "ATAK_VIDEO_PORT=${ATAK_VIDEO_PORT}" >> /tmp/$$.env && \
+		echo "ATAK_VIDEO_IFACE=eth9" >> /tmp/$$.env && \
+		echo "ATAK_BITRATE=500" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_HOST=" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_PORT=" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_BITRATE=750" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_ORG=ECHOMAV" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_STREAMNAME=" >> /tmp/$$.env && \
+        echo "PLATFORM=RPIX" >> /tmp/$$.env
+
+		;;
 
 	*)
 		# preserve contents or generate a viable empty configuration
