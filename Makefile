@@ -204,6 +204,9 @@ install: dependencies
 # provision n2n
 	@$(SUDO) python3 n2nConfigure.py --interactive --start
 
+# provision primary config file with telemetry endpoint
+	@$(MAKE) --no-print-directory provision
+
 # cleanup and final settings
 	@echo "Final cleanup..."
 	@$(SUDO) chown -R echopilot /usr/local/echopilot
@@ -223,6 +226,11 @@ see:
 	@echo -n "Cellular APN is: "
 	@$(SUDO) nmcli con show cellular | grep gsm.apn | cut -d ":" -f2 | xargs
 
+provision:
+	@$(MAKE) --no-print-directory -B $(SYSCFG)/echoliteProxy.conf
+
+$(SYSCFG)/%.conf:
+	@PLATFORM=$(PLATFORM) ./provision.sh $@
 
 uninstall:
 	@$(MAKE) --no-print-directory disable
