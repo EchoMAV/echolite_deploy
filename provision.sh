@@ -96,3 +96,16 @@ else
 	$SUDO install -Dm644 /tmp/$$.env $CONF
 fi
 rm /tmp/$$.env
+
+ASCII_ART="  ______     _           __  __     __      __
+ |  ____|   | |         |  \/  |   /\ \    / /
+ | |__   ___| |__   ___ | \  / |  /  \ \  / / 
+ |  __| / __| '_ \ / _ \| |\/| | / /\ \ \/ /  
+ | |___| (__| | | | (_) | |  | |/ ____ \  /   
+ |______\___|_| |_|\___/|_|  |_/_/    \_\/    
+"
+
+# Append the ASCII art to the /etc/motd file
+$SUDO echo "$ASCII_ART" >> /etc/motd
+
+
