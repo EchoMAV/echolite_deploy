@@ -64,7 +64,7 @@ case "$(basename $CONF)" in
 			
 		HOST=$(value_of HOST 172.20.1.1)  # $(echo $(address_of ${IFACE}) | cut -f1,2 -d.).255.255)
 		PORT=$(value_of PORT 14550)
-		SERIAL_NUMBER=$(value_of SERIAL_NUMBER 0001)
+		LOCAL_SERIAL_NUMBER=$(value_of LOCAL_SERIAL_NUMBER 0001)
 
 		# Get the mac address
 		MAC_ADDRESS=$(ifconfig eth0 | awk '/ether/ {print $2}')
@@ -77,12 +77,12 @@ case "$(basename $CONF)" in
 			#IFACE=$(interactive "$IFACE" "UDP Interface for telemetry")
 			HOST=$(interactive "$HOST" "UDP IPv4 for telemetry")
 			PORT=$(interactive "$PORT" "UDP PORT for telemetry")						
-			SERIAL_NUMBER=$(interactive "$SERIAL_NUMBER" "Serial Number for Vehicle")
+			LOCAL_SERIAL_NUMBER=$(interactive "$LOCAL_SERIAL_NUMBER" "Serial Number for Vehicle")
 			ATAK_HOST=$(interactive "$ATAK_HOST" "ATAK Video Endpoint Multicast Group Address")
 			ATAK_PORT=$(interactive "$ATAK_PORT" "ATAK Video Endpoint Multicast Group Port")
 		fi
         echo "[Service]" > /tmp/$$.env && \
-		echo "SERIAL_NUMBER=${SERIAL_NUMBER}" >> /tmp/$$.env && \
+		echo "LOCAL_SERIAL_NUMBER=${LOCAL_SERIAL_NUMBER}" >> /tmp/$$.env && \
         echo "TELEM_LOS=eth0,${HOST}:${PORT}" >> /tmp/$$.env && \
         echo "FMU_SERIAL=/dev/ttyAMA3" >> /tmp/$$.env && \
         echo "FMU_BAUDRATE=500000" >> /tmp/$$.env && \

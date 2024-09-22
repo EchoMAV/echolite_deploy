@@ -133,12 +133,12 @@ $SUDO nmcli c mod "static-$IFACE" +ipv4.addresses "$BACKDOOR_ADDR"
 # disable ipv6
 $SUDO nmcli c mod "static-$IFACE" ipv6.method "disabled"
 
-# bring up the interface
-$SUDO nmcli c up "static-$IFACE"
-
 # Set mcast routes
 $SUDO nmcli con mod "static-$IFACE" +ipv4.routes "224.0.0.0/8"
 $SUDO nmcli con mod "static-$IFACE" +ipv4.routes "239.0.0.0/8"
+
+# bring up the interface
+$SUDO nmcli c up "static-$IFACE"
 
 # change hostname
 #echo "Setting hostname to EchoMAV-SBX...";
