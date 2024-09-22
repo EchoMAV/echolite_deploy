@@ -63,6 +63,8 @@ updateProxy:
 	@$(MAKE) --no-print-directory enable
 #now setup the network again
 	@$(MAKE) --no-print-directory network
+	@$(MAKE) --no-print-directory provision
+	@$(MAKE) --no-print-directory provision-video
 
 cellular:
 # run script which sets up nmcli "cellular" connection. Remove --defaults if you want it to be interactive, otherwise it'll use the default ATT APN: Broadband
@@ -225,7 +227,7 @@ see:
 #   mavnet conf not applicable yet
 #	$(SUDO) cat $(SYSCFG)/mavnet.conf
 	$(SUDO) cat $(SYSCFG)/video.conf
-	$(SUDO) cat $(SYSCFG)/edge.conf
+#	$(SUDO) cat $(SYSCFG)/edge.conf
 	@echo -n "Cellular APN is: "
 	@$(SUDO) nmcli con show cellular | grep gsm.apn | cut -d ":" -f2 | xargs
 
@@ -236,7 +238,7 @@ provision-video:
 	@$(MAKE) --no-print-directory -B $(SYSCFG)/video.conf
 
 $(SYSCFG)/%.conf:
-	@PLATFORM=$(PLATFORM) ./provision.sh $@
+	@$(SUDO) @PLATFORM=$(PLATFORM) ./provision.sh $@
 
 uninstall:
 	@$(MAKE) --no-print-directory disable
