@@ -70,7 +70,7 @@ case "$(basename $CONF)" in
 		MAC_ADDRESS=$(ifconfig eth0 | awk '/ether/ {print $2}')
 		OCT1DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[5]}'`))
 		OCT2DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[6]}'`))
-		ATAK_HOST=239.2.$OCT1DEC.$OCT2DEC
+		ATAK_HOST=$(value_of ATAK_HOST 239.2.3.1)
 		ATAK_PORT=$(value_of ATAK_PORT 6969)
 		
 		if ! $DEFAULTS ; then
@@ -78,8 +78,8 @@ case "$(basename $CONF)" in
 			HOST=$(interactive "$HOST" "UDP IPv4 for telemetry")
 			PORT=$(interactive "$PORT" "UDP PORT for telemetry")						
 			LOCAL_SERIAL_NUMBER=$(interactive "$LOCAL_SERIAL_NUMBER" "Serial Number for Vehicle")
-			ATAK_HOST=$(interactive "$ATAK_HOST" "ATAK Video Endpoint Multicast Group Address")
-			ATAK_PORT=$(interactive "$ATAK_PORT" "ATAK Video Endpoint Multicast Group Port")
+			ATAK_HOST=$(interactive "$ATAK_HOST" "ATAK CoT Endpoint Multicast Group Address (where to send CoT messages)")
+			ATAK_PORT=$(interactive "$ATAK_PORT" "ATAK CoT Endpoint Multicast Group Port")
 		fi
         echo "[Service]" > /tmp/$$.env && \
 		echo "LOCAL_SERIAL_NUMBER=${LOCAL_SERIAL_NUMBER}" >> /tmp/$$.env && \
