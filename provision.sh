@@ -147,8 +147,10 @@ ASCII_ART="  ______     _           __  __     __      __
  | |___| (__| | | | (_) | |  | |/ ____ \  /   
  |______\___|_| |_|\___/|_|  |_/_/    \_\/    
 "
+MOTD_FILE="/etc/motd"
 
-# Append the ASCII art to the /etc/motd file
-$SUDO echo "$ASCII_ART" >> /etc/motd
-
+if ! grep -q "$ASCII_ART" "$MOTD_FILE"; then
+    # If not, append the ASCII art to the file
+    $SUDO echo "$ASCII_ART" >> "$MOTD_FILE"    
+fi
 
