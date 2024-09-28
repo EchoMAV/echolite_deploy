@@ -140,8 +140,9 @@ install: dependencies
 	@PLATFORM=$(PLATFORM) ./ensure-gstd.sh $(DRY_RUN)	
 	
 # build and install n2n
-	@echo "Installing and configurign N2N..."
-	@$(MAKE) --no-print-directory n2n
+# don't install n2n by defaule
+#	@echo "Installing and configurign N2N..."
+#	@$(MAKE) --no-print-directory n2n
 
 # install cockpit
 	@echo "Installing Cockpit..."
@@ -204,7 +205,7 @@ install: dependencies
 	@$(MAKE) --no-print-directory network
 
 # provision n2n
-	@$(SUDO) python3 n2nConfigure.py --interactive --start
+#	@$(SUDO) python3 n2nConfigure.py --interactive --start
 
 # provision primary config file with telemetry endpoint
 	@$(MAKE) --no-print-directory provision
@@ -224,10 +225,7 @@ install: dependencies
 
 see:
 	$(SUDO) cat $(SYSCFG)/echoliteProxy.conf
-#   mavnet conf not applicable yet
-#	$(SUDO) cat $(SYSCFG)/mavnet.conf
 	$(SUDO) cat $(SYSCFG)/video.conf
-#	$(SUDO) cat $(SYSCFG)/edge.conf
 	@echo -n "Cellular APN is: "
 	@$(SUDO) nmcli con show cellular | grep gsm.apn | cut -d ":" -f2 | xargs
 
