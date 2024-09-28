@@ -61,8 +61,25 @@ config[iface]=$(value_from_network IFACE wlan0)
 
 case "$(basename $CONF)" in
 	echoliteProxy.conf)
-			
-		HOST=$(value_of HOST 172.20.1.1)  # $(echo $(address_of ${IFACE}) | cut -f1,2 -d.).255.255)
+
+		echo "Which radio will be installed in this aircraft?:"
+		echo "M. Microhard"
+		echo "H. Herelink"
+		
+		# Prompt user for input
+		read -p "Enter your choice (M or H): " choice
+		
+		# Respond based on the user's choice
+		if [[ "$choice" == "M" || "$choice" == "m" ]]; then		        
+		        HOST="172.20.1.1";		        				
+		elif [[ "$choice" == "H" || "$choice" == "h" ]]; then		        
+		        HOST="192.168.144.11";		        
+		        #echo "Note for Herelink radios, the GCS radios are always 192.168.144.11";		        
+		else
+		    echo "Invalid choice. Please run the script again and select 1 or 2."
+		    exit 1
+		fi
+		HOST=$(value_of HOST $HOST)  
 		PORT=$(value_of PORT 14550)
 		LOCAL_SERIAL_NUMBER=$(value_of LOCAL_SERIAL_NUMBER 0001)
 
