@@ -2,8 +2,7 @@
 # EchoMAV, LLC
 # bstinson@echomav.com
 # Standard install is make install (requires internet)
-# Run make installed while the device has internet. At the end of the configuration, an interactive session will let you set up at static IP address
-
+# Run make installed while the device has internet. At the end of the configuration, interactive sessions will let you set up configuration files and networking
 SHELL := /bin/bash
 SN := $(shell hostname)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
