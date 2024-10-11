@@ -38,7 +38,7 @@ if echotherm --status | grep -q "echothermd not running"; then
         # Remove the lock file
         rm "$LOCK_FILE"      
     fi
-    sudo -u echopilot /usr/local/bin/echothermd --daemon
+    sudo -u echopilot /usr/local/bin/echothermd --daemon --colorPalette 4
     sleep 3
 fi
 
