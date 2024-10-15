@@ -16,6 +16,8 @@ fi
 ${SUDO} apt install -y python3-libcamera libcamera-apps
 ${SUDO} apt install -y python3-picamera2
 ${SUDO} apt install -y ffmpeg
+${SUDO} apt install -y python3-opencv
+${SUDO} apt install -y python3-numpy
 
 # Remove existing SRC directory if it exists
 if [ -d "$SRC" ]; then
