@@ -2,8 +2,7 @@
 # EchoMAV, LLC
 # bstinson@echomav.com
 # Standard install is make install (requires internet)
-# Run make installed while the device has internet. At the end of the configuration, an interactive session will let you set up at static IP address
-
+# Run make installed while the device has internet. At the end of the configuration, interactive sessions will let you set up configuration files and networking
 SHELL := /bin/bash
 SN := $(shell hostname)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
@@ -25,7 +24,7 @@ SW_LOCATION=sw_driver
 N2N_REPO=https://github.com/ntop/n2n.git
 N2N_REV=3.1.1
 
-.PHONY = clean dependencies cockpit cellular network enable install provision see uninstall n2n echotherm boson nginx pistreamer updateProxy
+.PHONY = clean dependencies cockpit cellular network enable install provision provision-video see uninstall n2n echotherm boson nginx pistreamer updateProxy
 
 default:
 	@echo "Please choose an action:"
@@ -63,6 +62,8 @@ updateProxy:
 	@$(MAKE) --no-print-directory enable
 #now setup the network again
 	@$(MAKE) --no-print-directory network
+	@$(MAKE) --no-print-directory provision
+	@$(MAKE) --no-print-directory provision-video
 
 cellular:
 # run script which sets up nmcli "cellular" connection. Remove --defaults if you want it to be interactive, otherwise it'll use the default ATT APN: Broadband
@@ -138,8 +139,9 @@ install: dependencies
 	@PLATFORM=$(PLATFORM) ./ensure-gstd.sh $(DRY_RUN)	
 	
 # build and install n2n
-	@echo "Installing and configurign N2N..."
-	@$(MAKE) --no-print-directory n2n
+# don't install n2n by defaule
+#	@echo "Installing and configurign N2N..."
+#	@$(MAKE) --no-print-directory n2n
 
 # install cockpit
 	@echo "Installing Cockpit..."
@@ -202,10 +204,13 @@ install: dependencies
 	@$(MAKE) --no-print-directory network
 
 # provision n2n
-	@$(SUDO) python3 n2nConfigure.py --interactive --start
+#	@$(SUDO) python3 n2nConfigure.py --interactive --start
 
 # provision primary config file with telemetry endpoint
 	@$(MAKE) --no-print-directory provision
+
+# provision video config 
+	@$(MAKE) --no-print-directory provision-video
 
 # cleanup and final settings
 	@echo "Final cleanup..."
@@ -219,18 +224,18 @@ install: dependencies
 
 see:
 	$(SUDO) cat $(SYSCFG)/echoliteProxy.conf
-#   mavnet conf not applicable yet
-#	$(SUDO) cat $(SYSCFG)/mavnet.conf
 	$(SUDO) cat $(SYSCFG)/video.conf
-	$(SUDO) cat $(SYSCFG)/edge.conf
 	@echo -n "Cellular APN is: "
 	@$(SUDO) nmcli con show cellular | grep gsm.apn | cut -d ":" -f2 | xargs
 
 provision:
 	@$(MAKE) --no-print-directory -B $(SYSCFG)/echoliteProxy.conf
 
+provision-video:
+	@$(MAKE) --no-print-directory -B $(SYSCFG)/video.conf
+
 $(SYSCFG)/%.conf:
-	@PLATFORM=$(PLATFORM) ./provision.sh $@
+	@$(SUDO) @PLATFORM=$(PLATFORM) ./provision.sh $@
 
 uninstall:
 	@$(MAKE) --no-print-directory disable

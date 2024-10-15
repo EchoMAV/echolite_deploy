@@ -61,8 +61,25 @@ config[iface]=$(value_from_network IFACE wlan0)
 
 case "$(basename $CONF)" in
 	echoliteProxy.conf)
-			
-		HOST=$(value_of HOST 172.20.1.1)  # $(echo $(address_of ${IFACE}) | cut -f1,2 -d.).255.255)
+
+		echo "Which radio will be installed in this aircraft?:"
+		echo "M. Microhard"
+		echo "H. Herelink"
+		
+		# Prompt user for input
+		read -p "Enter your choice (M or H): " choice
+		
+		# Respond based on the user's choice
+		if [[ "$choice" == "M" || "$choice" == "m" ]]; then		        
+		        HOST="172.20.1.1";		        				
+		elif [[ "$choice" == "H" || "$choice" == "h" ]]; then		        
+		        HOST="192.168.144.11";		        
+		        #echo "Note for Herelink radios, the GCS radios are always 192.168.144.11";		        
+		else
+		    echo "Invalid choice. Please run the script again and select 1 or 2."
+		    exit 1
+		fi
+		HOST=$(value_of HOST $HOST)  
 		PORT=$(value_of PORT 14550)
 		LOCAL_SERIAL_NUMBER=$(value_of LOCAL_SERIAL_NUMBER 0001)
 
@@ -92,7 +109,38 @@ case "$(basename $CONF)" in
         echo "SPARECOT_PORT=7200" >> /tmp/$$.env
 		;;
 
-	
+	video.conf)
+		# want to have option to change ATAK_VIDEO_HOST:PORT
+		MAC_ADDRESS=$(ifconfig eth0 | awk '/ether/ {print $2}')
+		OCT1DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[5]}'`))
+		OCT2DEC=$((0x`ifconfig eth0 | awk '/ether/ {print $2}' | awk '{split($0,a,"[:]"); print a[6]}'`))
+
+		ATAK_VIDEO_HOST=239.0.$OCT1DEC.$OCT2DEC  # $(echo $(address_of ${IFACE}) | cut -f1,2 -d.).255.255)
+		ATAK_VIDEO_PORT=$(value_of ATAK_VIDEO_PORT 5600)
+
+		if ! $DEFAULTS ; then
+			#IFACE=$(interactive "$IFACE" "UDP Interface for telemetry")
+			ATAK_VIDEO_HOST=$(interactive "$ATAK_VIDEO_HOST" "ATAK Multicast Video Group Address")
+			ATAK_VIDEO_PORT=$(interactive "$ATAK_VIDEO_PORT" "ATAK Multicast Video Port")								
+		fi
+
+		echo "[Service]" > /tmp/$$.env && \
+		echo "EO_PORT=5700" >> /tmp/$$.env && \
+        echo "EO_BITRATE=2000" >> /tmp/$$.env && \
+        echo "THERMAL_PORT=5800" >> /tmp/$$.env && \
+        echo "THERMAL_BITRATE=750" >> /tmp/$$.env && \
+        echo "ATAK_VIDEO_HOST=${ATAK_VIDEO_HOST}" >> /tmp/$$.env && \
+        echo "ATAK_VIDEO_PORT=${ATAK_VIDEO_PORT}" >> /tmp/$$.env && \
+		echo "ATAK_VIDEO_IFACE=eth9" >> /tmp/$$.env && \
+		echo "ATAK_BITRATE=500" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_HOST=" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_PORT=" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_BITRATE=750" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_ORG=ECHOMAV" >> /tmp/$$.env && \
+		echo "VIDEOSERVER_STREAMNAME=" >> /tmp/$$.env && \
+        echo "PLATFORM=RPIX" >> /tmp/$$.env
+
+		;;
 
 	*)
 		# preserve contents or generate a viable empty configuration
@@ -116,8 +164,10 @@ ASCII_ART="  ______     _           __  __     __      __
  | |___| (__| | | | (_) | |  | |/ ____ \  /   
  |______\___|_| |_|\___/|_|  |_/_/    \_\/    
 "
+MOTD_FILE="/etc/motd"
 
-# Append the ASCII art to the /etc/motd file
-$SUDO echo "$ASCII_ART" >> /etc/motd
-
+if ! grep -q "$ASCII_ART" "$MOTD_FILE"; then
+    # If not, append the ASCII art to the file
+    $SUDO echo "$ASCII_ART" >> "$MOTD_FILE"    
+fi
 
