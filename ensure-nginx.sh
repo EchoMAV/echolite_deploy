@@ -25,5 +25,5 @@ echo "Copying camera definition(s) to /var/www/html/camera_definitions/..."
 $SUDO mkdir -p /var/www/html/camera_definitions
 $SUDO cp camera_definitions/*.xml /var/www/html/camera_definitions/.
 echo "Creating video/photo directories..."
-$SUDO mkdir -p /var/www/html/video
-$SUDO mkdir -p /var/www/html/photo
+$SUDO mkdir -p /var/www/html/videos
+$SUDO mkdir -p /var/www/html/photos
