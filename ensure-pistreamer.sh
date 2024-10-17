@@ -28,5 +28,5 @@ fi
 echo "Cloning PiStreamer..."
 git clone https://github.com/EchoMAV/PiStreamer "$SRC"
 echo "Copying PiStreamer to ${DESTINATION}..."
-${SUDO} cp $SRC/pistreamer.py "$DESTINATION"
-${SUDO} chmod +x $DESTINATION/pistreamer.py 
+${SUDO} cp $SRC/*.py "$DESTINATION"
+${SUDO} chmod +x $DESTINATION/pistreamer_v2.py 
