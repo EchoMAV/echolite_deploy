@@ -9,6 +9,7 @@
             <description>EO Bitrate</description>
             <options>
                 <option name="500 Kbps" value="500" />
+                <option name="750 Kbps" value="750" />
                 <option name="1000 Kbps" value="1000" />
                 <option name="1500 Kbps" value="1500" />
                 <option name="2000 Kbps" value="2000" />
