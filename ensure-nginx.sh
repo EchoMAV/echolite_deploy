@@ -15,6 +15,15 @@ if ! grep -q "listen 8080" $NGINXCFG; then
     # Change the port to 8080 and restart
     echo "Changing the listening port for nginx to 8080"
     $SUDO sed -i 's/listen 80 /listen 8080 /g; s/listen \[::\]:80 /listen \[::\]:8080 /g' /etc/nginx/sites-available/default
+
+    # Check if "autoindex on;" is already in the file
+    if ! grep -q "autoindex on;" "$NGINXCFG"; then
+      # Insert "autoindex on;" in the location block if not present
+      sed -i '/location \/ {/a\ \ \ \ autoindex on;\n\ \ \ \ autoindex_exact_size off;\n\ \ \ \ autoindex_localtime on;' "$FILE_PATH"
+      echo "'autoindex on;' has been added."
+    else
+      echo "'autoindex on;' is already present."
+    fi   
     echo "Restarting nginx..."
     $SUDO systemctl restart nginx
 else
