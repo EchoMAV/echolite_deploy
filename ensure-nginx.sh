@@ -22,7 +22,7 @@ fi
 # Check if "autoindex on;" is already in the file
 if ! grep -q "autoindex on;" $NGINXCFG; then
   # Insert "autoindex on;" in the location block if not present
-  sed -i '/location \/ {/a\ \ \ \ autoindex on;\n\ \ \ \ autoindex_exact_size off;\n\ \ \ \ autoindex_localtime on;' "$FILE_PATH"
+  $SUDO sed -i '/location \/ {/a\ \ \ \ autoindex on;\n\ \ \ \ autoindex_exact_size off;\n\ \ \ \ autoindex_localtime on;' "$FILE_PATH"
   echo "'autoindex on;' has been added."
 else
   echo "'autoindex on;' is already present."
